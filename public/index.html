@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Granite-Loot NFT Forge</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .bg-pattern {
+            background-color: #0f172a;
+            background-image: radial-gradient(#334155 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .item-card {
+            transition: all 0.3s ease;
+        }
+        .item-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        .Common { color: #808080; }
+        .Uncommon { color: #4CEB34; }
+        .Rare { color: #3480EB; }
+        .Epic { color: #A134EB; }
+        .Legendary { color: #EB9634; }
+        .Mythic { color: #EB3434; }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen text-gray-100 flex flex-col">
+    <header class="bg-gray-900 border-b border-gray-800">
+        <div class="container mx-auto px-4 py-6">
+            <h1 class="text-4xl font-bold text-center bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+                Granite-Loot NFT Forge
+            </h1>
+            <p class="text-center text-gray-400 mt-2">AI-Generated Game Loot on Polkadot Asset Hub</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 flex-grow">
+        <div class="max-w-lg mx-auto bg-gray-800 rounded-lg p-6 shadow-xl">
+            <h2 class="text-2xl font-semibold mb-4">Mint Your AI-Generated Loot</h2>
+            
+            <div class="mb-4">
+                <label for="address" class="block text-sm font-medium text-gray-300 mb-1">Your Westend Address</label>
+                <input type="text" id="address" class="w-full px-4 py-2 rounded bg-gray-700 border border-gray-600 text-white" 
+                       placeholder="Enter your Westend testnet address">
+            </div>
+            
+            <button id="mintBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded 
+                   transition duration-300 flex items-center justify-center">
+                <span>Generate & Mint Loot Item</span>
+            </button>
+            
+            <div id="loadingIndicator" class="hidden mt-4 text-center">
+                <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+                <p class="mt-2 text-gray-300">Forging your legendary item...</p>
+            </div>
+        </div>
+        
+        <div id="resultSection" class="hidden max-w-lg mx-auto mt-8">
+            <div id="itemCard" class="bg-gray-800 rounded-lg overflow-hidden shadow-xl item-card border-2">
+                <div class="p-6">
+                    <div class="flex justify-between items-start">
+                        <h3 id="itemName" class="text-2xl font-bold"></h3>
+                        <span id="itemRarity" class="text-sm font-semibold px-3 py-1 rounded-full"></span>
+                    </div>
+                    
+                    <div class="mt-4 space-y-3">
+                        <div>
+                            <span class="text-gray-400 text-sm">Type:</span>
+                            <span id="itemType" class="ml-2"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 text-sm">Stats:</span>
+                            <span id="itemStats" class="ml-2"></span>
+                        </div>
+                        <div>
+                            <span class="text-gray-400 text-sm">Backstory:</span>
+                            <p id="itemBackstory" class="mt-1 text-gray-300"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-gray-700">
+                        <div class="text-sm text-gray-400">
+                            <div class="flex justify-between">
+                                <span>IPFS Hash:</span>
+                                <a id="ipfsLink" href="#" target="_blank" class="text-blue-400 hover:text-blue-300"></a>
+                            </div>
+                            <div class="flex justify-between mt-1">
+                                <span>Transaction:</span>
+                                <a id="txLink" href="#" target="_blank" class="text-blue-400 hover:text-blue-300"></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button id="mintAgainBtn" class="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded 
+                       transition duration-300">
+                    Forge Another Item
+                </button>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="bg-gray-900 border-t border-gray-800 py-4">
+        <div class="container mx-auto px-4 text-center text-gray-400 text-sm">
+            Granite-Loot NFT Forge - A demo project using IBM Granite LLM and Polkadot Asset Hub
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mintBtn = document.getElementById('mintBtn');
+            const mintAgainBtn = document.getElementById('mintAgainBtn');
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            const resultSection = document.getElementById('resultSection');
+            const addressInput = document.getElementById('address');
+            
+            // Sample demo Westend address if none provided
+            if (!addressInput.value) {
+                addressInput.value = '5CiPPseXPECbkjWCa6MnjNokrgYjMqmKndv2rSnekmSK2DjL';
+            }
+            
+            mintBtn.addEventListener('click', async () => {
+                const address = addressInput.value.trim();
+                
+                if (!address) {
+                    alert('Please enter a Westend address');
+                    return;
+                }
+                
+                // Show loading
+                mintBtn.disabled = true;
+                loadingIndicator.classList.remove('hidden');
+                resultSection.classList.add('hidden');
+                
+                try {
+                    const response = await fetch('/api/mint', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ address })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    // Update UI with the results
+                    document.getElementById('itemName').textContent = data.item.name;
+                    document.getElementById('itemType').textContent = data.item.type;
+                    document.getElementById('itemStats').textContent = data.item.stats;
+                    document.getElementById('itemBackstory').textContent = data.item.backstory;
+                    
+                    const rarityEl = document.getElementById('itemRarity');
+                    rarityEl.textContent = data.item.rarity;
+                    rarityEl.className = `text-sm font-semibold px-3 py-1 rounded-full bg-gray-700 ${data.item.rarity}`;
+                    
+                    document.getElementById('itemCard').className = 
+                        `bg-gray-800 rounded-lg overflow-hidden shadow-xl item-card border-2 border-${data.item.rarity.toLowerCase()}-500`;
+                    
+                    const ipfsLink = document.getElementById('ipfsLink');
+                    ipfsLink.textContent = `${data.ipfsHash.substring(0, 6)}...${data.ipfsHash.substring(data.ipfsHash.length - 4)}`;
+                    ipfsLink.href = `https://gateway.pinata.cloud/ipfs/${data.ipfsHash}`;
+                    
+                    const txLink = document.getElementById('txLink');
+                    txLink.textContent = `${data.mintResult.txHash.substring(0, 6)}...${data.mintResult.txHash.substring(data.mintResult.txHash.length - 4)}`;
+                    txLink.href = `https://westend.subscan.io/extrinsic/${data.mintResult.txHash}`;
+                    
+                    // Show results
+                    resultSection.classList.remove('hidden');
+                } catch (error) {
+                    alert(`Error: ${error.message || 'Failed to mint NFT'}`);
+                    console.error(error);
+                } finally {
+                    // Hide loading
+                    mintBtn.disabled = false;
+                    loadingIndicator.classList.add('hidden');
+                }
+            });
+            
+            mintAgainBtn.addEventListener('click', () => {
+                resultSection.classList.add('hidden');
+                addressInput.focus();
+            });
+        });
+    </script>
+</body>
+</html>

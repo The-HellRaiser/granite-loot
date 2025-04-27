@@ -1,0 +1,30 @@
+{
+  "name": "granite_loot",
+  "version": "1.0.0",
+  "description": "grait loot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "node scripts/compile-contract.js",
+    "deploy": "node deploy-contract.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.3.0",
+    "@parity/revive": "^0.0.21",
+    "@pinata/sdk": "^2.1.0",
+    "@polkadot/api": "^15.9.2",
+    "@polkadot/keyring": "^13.4.4",
+    "@polkadot/util": "^13.4.4",
+    "@polkadot/util-crypto": "^13.4.4",
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "ethers": "^6.13.7",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2",
+    "ollama": "^0.5.15",
+    "solc": "^0.8.29",
+    "web3": "^4.16.0"
+  }
+}
