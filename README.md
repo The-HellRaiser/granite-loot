@@ -44,12 +44,11 @@ The GraniteLoot contract is a lightweight, custom NFT system designed for games 
 - A funded Westend testnet account
 - pinata api keys for ipfs
 
-## Quick Start (60 min setup)
 
 1. **Clone the repository and install dependencies**
 
 ```bash
-git clone https://github.com/yourusername/granite-loot.git
+git clone https://github.com/The-HellRaiser/granite-loot
 cd granite-loot
 npm install
 ```
